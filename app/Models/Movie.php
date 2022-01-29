@@ -15,4 +15,10 @@ class Movie extends Model
     protected $fillable = [
         'id', 'name', 'year', 'runtime', 'releasedate', 'storyline',
     ];
+
+
+    public function actors()
+    {
+        return $this->belongsToMany(Actor::class, 'cast', 'movieId', 'actorId');
+    }
 }
