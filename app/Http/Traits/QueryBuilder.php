@@ -30,6 +30,14 @@ trait QueryBuilder
     public function getMoviesFields($fieldQuery)
     {
         # code...
-        return ['id', 'name'];
+        if (!$fieldQuery) {
+            return ["id", "name"];
+        }
+
+        $validFields = ['id', 'name', 'year', 'runtime', 'releasedate', 'storyline'];
+
+        $fields = array_intersect(explode(",", $fieldQuery), $validFields);
+
+        return sizeof($fields) == 0 ? null : $fields;
     }
 }
