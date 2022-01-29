@@ -12,6 +12,7 @@ class Actor extends Model
     protected $keyType = 'string';
     public $incrementing = false;
     protected $table = 'actors';
+    protected $hidden = ['pivot'];
     protected $fillable = [
         'id', 'name', 'birthname', 'birthdate', 'birthplace'
     ];
