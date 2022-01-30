@@ -19,9 +19,11 @@ trait QueryBuilder
         $paging = $request->has('paging') ? ($request->paging === 'false' ? false : true) : true;
         $pageSize = intval($request->pageSize ?? env('DEFAULT_PAGE_SIZE'));
 
-        $moviesFields = $this->getMoviesFields($request->fields);
+        $moviesValidFields = ['id', 'name', 'year', 'runtime', 'releasedate', 'storyline', '*'];
 
-        $query = Movie::select($moviesFields);
+        $moviesFields = $this->getFields($request->fields, $moviesValidFields);
+
+        $query = Movie::select(in_array("*", $moviesFields) ? "*" : $moviesFields);
 
         if (str_contains($request->fields, "actors") || in_array("*", $moviesFields)) {
 
@@ -30,8 +32,8 @@ trait QueryBuilder
             $actorQueryFields = trim($actorQueryFields, "[]") ?? null;
 
             // dd($actorQueryFields);
-
-            $actorsFields = $this->getActorsFields($actorQueryFields);
+            $actorValidFields = ['id', 'name', 'birthname', 'birthdate', 'birthplace', "*"];
+            $actorsFields = $this->getFields($actorQueryFields, $actorValidFields);
 
             // dd($actorsFields);
 
@@ -43,28 +45,12 @@ trait QueryBuilder
     }
 
 
-    public function getMoviesFields($fieldQuery)
+    public function getFields($fieldQuery, $validFields)
     {
         # code...
         if (!$fieldQuery) {
             return ["id", "name"];
         }
-
-        $validFields = ['id', 'name', 'year', 'runtime', 'releasedate', 'storyline', '*'];
-
-        $fields = array_intersect(explode(",", $fieldQuery), $validFields);
-
-        return sizeof($fields) == 0 ? null : $fields;
-    }
-
-    public function getActorsFields($fieldQuery)
-    {
-        # code...
-        if (!$fieldQuery) {
-            return ["id", "name"];
-        }
-
-        $validFields = ['id', 'name', 'birthname', 'birthdate', 'birthplace', "*"];
 
         $fields = array_intersect(explode(",", $fieldQuery), $validFields);
 
