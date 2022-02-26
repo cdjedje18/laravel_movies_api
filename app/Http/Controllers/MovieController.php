@@ -63,4 +63,13 @@ class MovieController extends Controller
         }
         return response()->json(["status" => 500, "message" => "Internal Server Error"], 500);
     }
+
+    public function update(Request $request, Movie $movie)
+    {
+        $result = $movie->update($request->all());
+        if ($result) {
+            return response()->json(["status" => 200, "movie" => $movie], 200);
+        }
+        return response()->json(["status" => 500, "message" => "Internal Server Error"], 500);
+    }
 }
