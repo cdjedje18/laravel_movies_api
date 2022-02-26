@@ -12,6 +12,7 @@ class Movie extends Model
     protected $keyType = 'string';
     public $incrementing = false;
     protected $table = 'movies';
+    protected $hidden = ['pivot'];
     protected $fillable = [
         'id', 'name', 'year', 'runtime', 'releasedate', 'storyline',
     ];

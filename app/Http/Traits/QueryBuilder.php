@@ -2,6 +2,7 @@
 
 namespace App\Http\Traits;
 
+use App\Models\Actor;
 use App\Models\Movie;
 use App\Models\User;
 use Carbon\Carbon;
@@ -69,6 +70,58 @@ trait QueryBuilder
             // dd($actorsFields);
 
             $query->with('actors:' . implode(",", $actorsFields));
+        }
+
+        return $paging ? $query->paginate($pageSize) : $query->get();
+    }
+
+
+    public function actorsQueryBuilder(Request $request)
+    {
+        # code...
+        $paging = $request->has('paging') ? ($request->paging === 'false' ? false : true) : true;
+        $pageSize = intval($request->pageSize ?? env('DEFAULT_PAGE_SIZE'));
+
+        // dd($request->path());
+
+        $filterQueries = $this->getfilterQuery();
+
+        $actorsValidFields = ['id', 'name', 'birthname', 'birthdate', 'birthplace', "*"];
+
+        $actorsFields = $this->getFields($request->fields, $actorsValidFields);
+
+        $query = Actor::select(in_array("*", $actorsFields) ? "*" : $actorsFields);
+
+        if ($filterQueries) {
+            $whereClauses = array_map(function ($item) {
+                $clause = explode(':', $item);
+
+                if (sizeof($clause) == 3) {
+                    if ($this->filters[$clause[1]] == "like") {
+                        return [$clause[0], $this->filters[$clause[1]], '%' . $clause[2] . '%'];
+                    }
+                    return [$clause[0], $this->filters[$clause[1]], $clause[2]];
+                }
+            }, $filterQueries['filter']);
+
+            // dd($whereClauses);
+
+            $query->where($whereClauses);
+        }
+
+        if (str_contains($request->fields, "movies") || in_array("*", $actorsFields)) {
+
+            $movieQueryFields = explode('movies', $request->fields)[1] ?? null;
+
+            $movieQueryFields = trim($movieQueryFields, "[]") ?? null;
+
+            // dd($actorQueryFields);
+            $moviesValidFields = ['id', 'name', 'year', 'runtime', 'releasedate', 'storyline', '*'];
+            $moviesFields = $this->getFields($movieQueryFields, $moviesValidFields);
+
+            // dd($actorsFields);
+
+            $query->with('movies:' . implode(",", $moviesFields));
         }
 
         return $paging ? $query->paginate($pageSize) : $query->get();

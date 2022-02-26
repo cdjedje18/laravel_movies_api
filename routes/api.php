@@ -22,3 +22,9 @@ Route::get("movies", 'MovieController@index');
 Route::get("movies/{id}", 'MovieController@show');
 Route::post("movies", 'MovieController@store');
 Route::put("movies/{movie}", 'MovieController@update');
+
+
+Route::get("actors", 'ActorController@index');
+Route::get("actors/{id}", 'ActorController@show');
+Route::post("actors", 'ActorController@store');
+Route::put("actors/{actor}", 'ActorController@update');
