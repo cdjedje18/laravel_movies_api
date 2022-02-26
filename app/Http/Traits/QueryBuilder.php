@@ -90,7 +90,7 @@ trait QueryBuilder
     public function getfilterQuery()
     {
         # code...
-        $query  = explode('&', $_SERVER['QUERY_STRING']);
+        $query = array_key_exists('QUERY_STRING', $_SERVER) ? explode('&', $_SERVER['QUERY_STRING']) : [];
         $params = array();
 
         foreach ($query as $param) {

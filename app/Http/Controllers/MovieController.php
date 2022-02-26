@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Traits\Helpers;
 use App\Http\Traits\QueryBuilder;
 use App\Models\Movie;
 use Illuminate\Http\Request;
@@ -9,7 +10,7 @@ use Illuminate\Http\Request;
 class MovieController extends Controller
 {
     //
-    use QueryBuilder;
+    use QueryBuilder, Helpers;
 
     public function index(Request $request)
     {
@@ -42,11 +43,24 @@ class MovieController extends Controller
 
     public function show(Request $request, $id)
     {
-        # code...
-
         $responseData = null;
         $movies = Movie::find($id);
 
         return response()->json($movies, 200);
+    }
+
+    public function store(Request $request)
+    {
+        $movie = new Movie();
+        $movie->id = $this->idGenerator();
+        foreach ($request->all() as $key => $value) {
+            $movie->{$key} = $value;
+        }
+        $result = $movie->save();
+        // dd($movie);
+        if ($result) {
+            return response()->json(["status" => 201, "movie" => $movie], 201);
+        }
+        return response()->json(["status" => 500, "message" => "Internal Server Error"], 500);
     }
 }
