@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Traits\Helpers;
 use App\Http\Traits\QueryBuilder;
 use App\Models\Movie;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class MovieController extends Controller
@@ -51,10 +52,12 @@ class MovieController extends Controller
 
     public function store(Request $request)
     {
-        $movie = new Movie();
-        $movie->id = $this->idGenerator();
+        $movie = $request->has('id') ? Movie::find($request->id) : new Movie();
         foreach ($request->all() as $key => $value) {
             $movie->{$key} = $value;
+        }
+        if (!$movie->id) {
+            $movie->id = $this->idGenerator();
         }
         $result = $movie->save();
         // dd($movie);
