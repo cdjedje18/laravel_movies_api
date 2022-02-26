@@ -51,26 +51,26 @@ class ActorController extends Controller
 
     public function store(Request $request)
     {
-        $Actor = $request->has('id') ? Actor::find($request->id) : new Actor();
+        $actor = $request->has('id') ? Actor::find($request->id) : new Actor();
         foreach ($request->all() as $key => $value) {
-            $Actor->{$key} = $value;
+            $actor->{$key} = $value;
         }
-        if (!$Actor->id) {
-            $Actor->id = $this->idGenerator();
+        if (!$actor->id) {
+            $actor->id = $this->idGenerator();
         }
-        $result = $Actor->save();
-        // dd($Actor);
+        $result = $actor->save();
+        // dd($actor);
         if ($result) {
-            return response()->json(["status" => 201, "Actor" => $Actor], 201);
+            return response()->json(["status" => 201, "actor" => $actor], 201);
         }
         return response()->json(["status" => 500, "message" => "Internal Server Error"], 500);
     }
 
-    public function update(Request $request, Actor $Actor)
+    public function update(Request $request, Actor $actor)
     {
-        $result = $Actor->update($request->all());
+        $result = $actor->update($request->all());
         if ($result) {
-            return response()->json(["status" => 200, "Actor" => $Actor], 200);
+            return response()->json(["status" => 200, "actor" => $actor], 200);
         }
         return response()->json(["status" => 500, "message" => "Internal Server Error"], 500);
     }
