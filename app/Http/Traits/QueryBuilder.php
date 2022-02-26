@@ -128,6 +128,43 @@ trait QueryBuilder
     }
 
 
+    public function castsQueryBuilder(Request $request)
+    {
+        # code...
+        $paging = $request->has('paging') ? ($request->paging === 'false' ? false : true) : true;
+        $pageSize = intval($request->pageSize ?? env('DEFAULT_PAGE_SIZE'));
+
+        // dd($request->path());
+
+        $filterQueries = $this->getfilterQuery();
+
+        $castsValidFields = ['id', 'movieId', 'actorId', "*"];
+
+        $castsFields = $this->getFields($request->fields, $castsValidFields);
+
+        $query = Actor::select(in_array("*", $castsFields) ? "*" : $castsFields);
+
+        if ($filterQueries) {
+            $whereClauses = array_map(function ($item) {
+                $clause = explode(':', $item);
+
+                if (sizeof($clause) == 3) {
+                    if ($this->filters[$clause[1]] == "like") {
+                        return [$clause[0], $this->filters[$clause[1]], '%' . $clause[2] . '%'];
+                    }
+                    return [$clause[0], $this->filters[$clause[1]], $clause[2]];
+                }
+            }, $filterQueries['filter']);
+
+            // dd($whereClauses);
+
+            $query->where($whereClauses);
+        }
+
+        return $paging ? $query->paginate($pageSize) : $query->get();
+    }
+
+
     public function getFields($fieldQuery, $validFields)
     {
         # code...

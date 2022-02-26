@@ -28,3 +28,9 @@ Route::get("actors", 'ActorController@index');
 Route::get("actors/{id}", 'ActorController@show');
 Route::post("actors", 'ActorController@store');
 Route::put("actors/{actor}", 'ActorController@update');
+
+
+Route::get("casts", 'CastController@index');
+Route::get("casts/{id}", 'CastController@show');
+Route::post("casts", 'CastController@store');
+Route::put("casts/{cast}", 'CastController@update');
