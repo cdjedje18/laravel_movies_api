@@ -218,11 +218,13 @@ trait QueryBuilder
             array_push($nestedObjectsAux[$nestedObjects[sizeof($nestedObjects) - 1]], $field);
         }
 
+        // dd($nestedObjectsAux);
+
         $relations = [];
         foreach ($nestedObjectsAux as $key => $value) {
             if ($key !== "main") {
                 $newKey = explode("main.", $key);
-                array_push($relations, $newKey[1] . ":" . implode(",", $value));
+                array_push($relations, sizeof($value) > 0 ? $newKey[1] . ":" . implode(",", $value) : $newKey[1]);
             }
         }
 
@@ -231,6 +233,7 @@ trait QueryBuilder
             "relations" => $relations,
         ];
 
+        // dd($fieldsAndRelations);
         return $fieldsAndRelations;
     }
 }
