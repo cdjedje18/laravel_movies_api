@@ -32,11 +32,13 @@ trait QueryBuilder
 
         // dd($request->path());
 
+        $fieldsAndRelations = $this->fieldsAndRelations($request->fields);
+
         $filterQueries = $this->getfilterQuery();
 
         $moviesValidFields = ['id', 'name', 'year', 'runtime', 'releasedate', 'storyline', '*'];
 
-        $moviesFields = $this->getFields($request->fields, $moviesValidFields);
+        $moviesFields = $this->getFields($fieldsAndRelations['fields'], $moviesValidFields);
 
         $query = Movie::select(in_array("*", $moviesFields) ? "*" : $moviesFields);
 
@@ -57,24 +59,12 @@ trait QueryBuilder
             $query->where($whereClauses);
         }
 
-        if (str_contains($request->fields, "actors") || in_array("*", $moviesFields)) {
-
-            $actorQueryFields = explode('actors', $request->fields)[1] ?? null;
-
-            $actorQueryFields = trim($actorQueryFields, "[]") ?? null;
-
-            // dd($actorQueryFields);
-            $actorValidFields = ['id', 'name', 'birthname', 'birthdate', 'birthplace', "*"];
-            $actorsFields = $this->getFields($actorQueryFields, $actorValidFields);
-
-            // dd($actorsFields);
-
-            $query->with('actors:' . implode(",", $actorsFields));
+        if (sizeof($fieldsAndRelations['relations']) > 0) {
+            $query->with($fieldsAndRelations['relations']);
         }
 
         return $paging ? $query->paginate($pageSize) : $query->get();
     }
-
 
     public function actorsQueryBuilder(Request $request)
     {
@@ -127,7 +117,6 @@ trait QueryBuilder
         return $paging ? $query->paginate($pageSize) : $query->get();
     }
 
-
     public function castsQueryBuilder(Request $request)
     {
         # code...
@@ -164,7 +153,6 @@ trait QueryBuilder
         return $paging ? $query->paginate($pageSize) : $query->get();
     }
 
-
     public function getFields($fieldQuery, $validFields)
     {
         # code...
@@ -172,7 +160,7 @@ trait QueryBuilder
             return ["id", "name"];
         }
 
-        $fields = array_intersect(explode(",", $fieldQuery), $validFields);
+        $fields = array_intersect($fieldQuery, $validFields);
 
         return sizeof($fields) == 0 ? null : $fields;
     }
@@ -191,5 +179,58 @@ trait QueryBuilder
         }
 
         return sizeof($params) > 0 ? $params : null;
+    }
+
+    public function fieldsAndRelations($fieldParam)
+    {
+        $nestedObjects = ['main'];
+        $nestedObjectsAux = ['main' => []];
+
+        $field = "";
+        $chars = str_split($fieldParam);
+        // dd($nestedObjects[sizeof($nestedObjects) - 1]);
+        foreach ($chars as $char) {
+            if ($char === ",") {
+                if (array_key_exists($nestedObjects[sizeof($nestedObjects) - 1], $nestedObjectsAux)) {
+                    if ($field !== "" && $field != null) {
+                        array_push($nestedObjectsAux[$nestedObjects[sizeof($nestedObjects) - 1]], $field);
+                    }
+                } else {
+                    $nestedObjectsAux[$nestedObjects[sizeof($nestedObjects) - 1]];
+                }
+                $field = "";
+            } elseif ($char === "[") {
+                $key = $nestedObjects[sizeof($nestedObjects) - 1] . "." . $field;
+                $nestedObjectsAux[$key] = [];
+                array_push($nestedObjects, $key);
+                $field = "";
+            } elseif ($char === "]") {
+                if ($field !== "" && $field != null) {
+                    array_push($nestedObjectsAux[$nestedObjects[sizeof($nestedObjects) - 1]], $field);
+                }
+                $field = "";
+                array_pop($nestedObjects);
+            } else {
+                $field .= $char;
+            }
+        }
+        if ($field !== "" && $field != null) {
+            array_push($nestedObjectsAux[$nestedObjects[sizeof($nestedObjects) - 1]], $field);
+        }
+
+        $relations = [];
+        foreach ($nestedObjectsAux as $key => $value) {
+            if ($key !== "main") {
+                $newKey = explode("main.", $key);
+                array_push($relations, $newKey[1] . ":" . implode(",", $value));
+            }
+        }
+
+        $fieldsAndRelations = [
+            "fields" => $nestedObjectsAux['main'],
+            "relations" => $relations,
+        ];
+
+        return $fieldsAndRelations;
     }
 }
