@@ -14,11 +14,10 @@ class ActorController extends Controller
 
     public function index(Request $request)
     {
-        # code...
-        $paging = $request->has('paging') ? ($request->paging === 'false' ? false : true) : true;
-        $pageSize = intval($request->pageSize ?? env('DEFAULT_PAGE_SIZE'));
 
-        $actors = $this->actorsQueryBuilder($request);
+        $actor = new Actor();
+
+        $actors = $this->queryBuilder($request, Actor::class, $actor->getFillable());
 
         if ($actors->total()) {
             $responseData = [

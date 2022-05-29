@@ -24,40 +24,22 @@ trait QueryBuilder
         "lte" => "<="
     ];
 
-    public function moviesQueryBuilder(Request $request)
+
+    public function queryBuilder(Request $request, $model, $validFields)
     {
         # code...
         $paging = $request->has('paging') ? ($request->paging === 'false' ? false : true) : true;
         $pageSize = intval($request->pageSize ?? env('DEFAULT_PAGE_SIZE'));
 
-        // dd($request->path());
-
         $fieldsAndRelations = $this->fieldsAndRelations($request->fields);
 
         $filterQueries = $this->getfilterQuery();
 
-        $moviesValidFields = ['id', 'name', 'year', 'runtime', 'releasedate', 'storyline', '*'];
+        $fields = $this->getFields($fieldsAndRelations['fields'], $validFields);
 
-        $moviesFields = $this->getFields($fieldsAndRelations['fields'], $moviesValidFields);
+        $whereClauses = $this->getWhereClauses($filterQueries);
 
-        $query = Movie::select(in_array("*", $moviesFields) ? "*" : $moviesFields);
-
-        if ($filterQueries) {
-            $whereClauses = array_map(function ($item) {
-                $clause = explode(':', $item);
-
-                if (sizeof($clause) == 3) {
-                    if ($this->filters[$clause[1]] == "like") {
-                        return [$clause[0], $this->filters[$clause[1]], '%' . $clause[2] . '%'];
-                    }
-                    return [$clause[0], $this->filters[$clause[1]], $clause[2]];
-                }
-            }, $filterQueries['filter']);
-
-            // dd($whereClauses);
-
-            $query->where($whereClauses);
-        }
+        $query = $model::select(in_array("*", $fields) ? "*" : $fields)->where($whereClauses);
 
         if (sizeof($fieldsAndRelations['relations']) > 0) {
             $query->with($fieldsAndRelations['relations']);
@@ -66,21 +48,9 @@ trait QueryBuilder
         return $paging ? $query->paginate($pageSize) : $query->get();
     }
 
-    public function actorsQueryBuilder(Request $request)
+
+    public function getWhereClauses($filterQueries)
     {
-        # code...
-        $paging = $request->has('paging') ? ($request->paging === 'false' ? false : true) : true;
-        $pageSize = intval($request->pageSize ?? env('DEFAULT_PAGE_SIZE'));
-
-        // dd($request->path());
-
-        $filterQueries = $this->getfilterQuery();
-
-        $actorsValidFields = ['id', 'name', 'birthname', 'birthdate', 'birthplace', "*"];
-
-        $actorsFields = $this->getFields($request->fields, $actorsValidFields);
-
-        $query = Actor::select(in_array("*", $actorsFields) ? "*" : $actorsFields);
 
         if ($filterQueries) {
             $whereClauses = array_map(function ($item) {
@@ -94,63 +64,10 @@ trait QueryBuilder
                 }
             }, $filterQueries['filter']);
 
-            // dd($whereClauses);
-
-            $query->where($whereClauses);
+            return $whereClauses;
         }
 
-        if (str_contains($request->fields, "movies") || in_array("*", $actorsFields)) {
-
-            $movieQueryFields = explode('movies', $request->fields)[1] ?? null;
-
-            $movieQueryFields = trim($movieQueryFields, "[]") ?? null;
-
-            // dd($actorQueryFields);
-            $moviesValidFields = ['id', 'name', 'year', 'runtime', 'releasedate', 'storyline', '*'];
-            $moviesFields = $this->getFields($movieQueryFields, $moviesValidFields);
-
-            // dd($actorsFields);
-
-            $query->with('movies:' . implode(",", $moviesFields));
-        }
-
-        return $paging ? $query->paginate($pageSize) : $query->get();
-    }
-
-    public function castsQueryBuilder(Request $request)
-    {
-        # code...
-        $paging = $request->has('paging') ? ($request->paging === 'false' ? false : true) : true;
-        $pageSize = intval($request->pageSize ?? env('DEFAULT_PAGE_SIZE'));
-
-        // dd($request->path());
-
-        $filterQueries = $this->getfilterQuery();
-
-        $castsValidFields = ['id', 'movieId', 'actorId', "*"];
-
-        $castsFields = $this->getFields($request->fields, $castsValidFields);
-
-        $query = Actor::select(in_array("*", $castsFields) ? "*" : $castsFields);
-
-        if ($filterQueries) {
-            $whereClauses = array_map(function ($item) {
-                $clause = explode(':', $item);
-
-                if (sizeof($clause) == 3) {
-                    if ($this->filters[$clause[1]] == "like") {
-                        return [$clause[0], $this->filters[$clause[1]], '%' . $clause[2] . '%'];
-                    }
-                    return [$clause[0], $this->filters[$clause[1]], $clause[2]];
-                }
-            }, $filterQueries['filter']);
-
-            // dd($whereClauses);
-
-            $query->where($whereClauses);
-        }
-
-        return $paging ? $query->paginate($pageSize) : $query->get();
+        return [];
     }
 
     public function getFields($fieldQuery, $validFields)
