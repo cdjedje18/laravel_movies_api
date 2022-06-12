@@ -77,6 +77,10 @@ trait QueryBuilder
             return ["id", "name"];
         }
 
+        if (in_array("*", $fieldQuery)) {
+            return ['*'];
+        }
+
         $fields = array_intersect($fieldQuery, $validFields);
 
         return sizeof($fields) == 0 ? null : $fields;

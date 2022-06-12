@@ -42,7 +42,7 @@ class MovieController extends Controller
 
             return response()->json($responseData, $responseData['status']);
         } catch (\Throwable $th) {
-            dd($th);
+            // dd($th);
         }
     }
 
