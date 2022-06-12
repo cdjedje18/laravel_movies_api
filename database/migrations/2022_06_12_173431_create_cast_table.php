@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCategoryTable extends Migration
+class CreateCastTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,12 @@ class CreateCategoryTable extends Migration
      */
     public function up()
     {
-        Schema::create('category', function (Blueprint $table) {
+        Schema::create('cast', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->string('name');
-            $table->string('description')->nullable();
+            $table->string('movieId');
+            $table->string('actorId');
+            $table->foreign('movieId')->references('id')->on('movies')->onDelete('cascade');
+            $table->foreign('actorId')->references('id')->on('actors')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ class CreateCategoryTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('category');
+        Schema::dropIfExists('cast');
     }
 }
