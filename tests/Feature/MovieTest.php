@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Traits\Helpers;
 use App\Models\Movie;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -9,16 +10,17 @@ use Tests\TestCase;
 
 class MovieTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, Helpers;
 
     public function test_get_moveis()
     {
         //preparation
         Movie::create([
+            'id' => $this->idGenerator(),
             'name' => "Test Movie",
             'year' => 2022,
             'runtime' => 124,
-            'realeasedate' => "2020-06-12",
+            'releasedate' => "2020-06-12",
             'storyline' => "demo movie"
         ]);
 
@@ -27,7 +29,6 @@ class MovieTest extends TestCase
         $response = $this->getJson('/api/movies');
 
         //assertion
-        dd($response);
         $response->assertStatus(200);
     }
 }
