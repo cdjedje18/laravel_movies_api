@@ -15,20 +15,13 @@ class MovieTest extends TestCase
     public function test_get_moveis()
     {
         //preparation
-        Movie::create([
-            'id' => $this->idGenerator(),
-            'name' => "Test Movie",
-            'year' => 2022,
-            'runtime' => 124,
-            'releasedate' => "2020-06-12",
-            'storyline' => "demo movie"
-        ]);
-
+        Movie::factory()->create();
 
         //action
         $response = $this->getJson('/api/movies');
 
         //assertion
+        // dd($response);
         $response->assertStatus(200);
     }
 }
