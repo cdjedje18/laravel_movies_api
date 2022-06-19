@@ -64,3 +64,58 @@ GET api/movies?filter=runtime:gt:90
 | lt | < | Less than |
 | lte | <= | Less than or equal to |
 
+
+Create Movie
+
+```sh
+POST api/movies
+```
+Payload
+```json
+{
+    "name": "Blacklight",
+    "year": 2022,
+    "runtime": 105,
+    "releasedate": "2022-02-25",
+    "storyline": "Travis Block is a government operative coming to terms with his shadowy past. When he discovers a plot targeting U.S. citizens, Block finds himself in the crosshairs of the FBI director he once helped protect."
+}
+```
+
+Update movie
+For the update action, we have differents options to do it, one is using a PUT request passing the object id at the url and the attributes we want to update at the paylod. Another way is to make a POST request, ant passing the object id at the payload as one of the attributes.
+
+```sh
+PUT api/movies/1QW6ZLB2KMO
+```
+
+Payload
+```json
+{
+    "year": 2022,
+    "runtime": 105,
+    "releasedate": "2022-02-25",
+}
+```
+
+```sh
+POST api/movies
+```
+
+Payload
+```json
+{
+    "id": "1QW6ZLB2KMO",
+    "name": "Blacklight",
+    "year": 2022,
+    "runtime": 105,
+    "releasedate": "2022-02-25",
+    "storyline": "Travis Block is a government operative coming to terms with his shadowy past. When he discovers a plot targeting U.S. citizens, Block finds himself in the crosshairs of the FBI director he once helped protect."
+}
+```
+
+
+Delete movie
+
+```sh
+DELETE api/movies/1QW6ZLB2KMO
+```
