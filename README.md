@@ -119,3 +119,67 @@ Delete movie
 ```sh
 DELETE api/movies/1QW6ZLB2KMO
 ```
+
+### Actors
+List Actors
+```sh
+GET api/actors
+```
+
+Select desired fields
+```sh
+GET api/actors?fields=id,name
+```
+
+Filter actors with name
+```sh
+GET api/actors?filter=name:like:Daddario
+```
+
+Create actor
+```sh
+POST api/actors
+```
+
+Payload
+```json
+{
+    "name": "John Cena",
+    "birthname": "John Cena",
+    "birthdate": "1977-04-23",
+    "birthplace": "West Newbury, Massachusetts, United States"
+}
+```
+
+Update Actor
+```sh
+PUT api/actors/W529Mv1CF48
+```
+
+Payload
+```json
+{
+    "birthname": "John Cena",
+    "birthdate": "1977-04-23"
+}
+```
+
+```sh
+POST api/actors
+```
+
+Payload
+```json
+{
+    "id": "W529Mv1CF48",
+    "name": "John Cena",
+    "birthname": "John Cena",
+    "birthdate": "1977-04-23",
+    "birthplace": "West Newbury, Massachusetts, United States"
+}
+```
+
+Delete actors
+```sh
+DELETE api/actors/W529Mv1CF48
+```
