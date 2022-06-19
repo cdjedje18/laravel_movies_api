@@ -53,7 +53,7 @@ Filter movies with runtime above 90 minutes
 GET api/movies?filter=runtime:gt:90
 ```
 
-### Avalible Filters
+### Available Filters
 | Operator | Expression | Description |
 | ------ | ------ | ------ |
 | eq | = | Equal to |
