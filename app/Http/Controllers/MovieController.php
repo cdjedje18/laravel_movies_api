@@ -18,11 +18,13 @@ class MovieController extends Controller
 
         try {
 
+            $paging = $request->has('paging') ? ($request->paging === 'false' ? false : true) : true;
+
             $movie = new Movie();
 
-            $movies = $this->queryBuilder($request, Movie::class, $movie->getFillable());
+            $movies = $this->queryBuilder($request, Movie::class, $movie->getFillable(), $paging);
 
-            if ($movies->total()) {
+            if ($paging) {
                 $responseData = [
                     "status" => 200,
                     "pager" => [

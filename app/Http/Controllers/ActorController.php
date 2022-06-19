@@ -15,11 +15,13 @@ class ActorController extends Controller
     public function index(Request $request)
     {
 
+        $paging = $request->has('paging') ? ($request->paging === 'false' ? false : true) : true;
+
         $actor = new Actor();
 
-        $actors = $this->queryBuilder($request, Actor::class, $actor->getFillable());
+        $actors = $this->queryBuilder($request, Actor::class, $actor->getFillable(), $paging);
 
-        if ($actors->total()) {
+        if ($paging) {
             $responseData = [
                 "status" => 200,
                 "pager" => [

@@ -25,10 +25,9 @@ trait QueryBuilder
     ];
 
 
-    public function queryBuilder(Request $request, $model, $validFields)
+    public function queryBuilder(Request $request, $model, $validFields, $paging)
     {
         # code...
-        $paging = $request->has('paging') ? ($request->paging === 'false' ? false : true) : true;
         $pageSize = intval($request->pageSize ?? env('DEFAULT_PAGE_SIZE'));
 
         $fieldsAndRelations = $this->fieldsAndRelations($request->fields);
@@ -51,6 +50,8 @@ trait QueryBuilder
 
     public function getWhereClauses($filterQueries)
     {
+
+        // dd($filterQueries);
 
         if ($filterQueries) {
             $whereClauses = array_map(function ($item) {
