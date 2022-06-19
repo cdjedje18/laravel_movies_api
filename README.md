@@ -81,7 +81,7 @@ Payload
 }
 ```
 
-Update movie
+Update movie\
 For the update action, we have differents options to do it, one is using a PUT request passing the object id at the url and the attributes we want to update at the paylod. Another way is to make a POST request, ant passing the object id at the payload as one of the attributes.
 
 ```sh
